@@ -4,6 +4,11 @@ import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import java.util.Properties;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Date;
 
 /**
@@ -28,14 +33,14 @@ public class EmailSender {
                                       String username, String password,
                                       String from, String to, 
                                       String subject, String body) throws MessagingException {
-        
+
         // Set mail server properties
         Properties properties = new Properties();
         properties.put("mail.smtp.host", host);
         properties.put("mail.smtp.port", port);
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.starttls.enable", "true");
-        
+
         // Create a mail session with authenticator
         Session session = Session.getInstance(properties, new Authenticator() {
             @Override
@@ -43,7 +48,7 @@ public class EmailSender {
                 return new PasswordAuthentication(username, password);
             }
         });
-        
+
         // Create a message
         Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(from));
@@ -51,13 +56,13 @@ public class EmailSender {
         message.setSubject(subject);
         message.setText(body);
         message.setSentDate(new Date());
-        
+
         // Send the message
         Transport.send(message);
-        
+
         System.out.println("Email sent successfully!");
     }
-    
+
     /**
      * Sends an email with attachments.
      *
@@ -77,14 +82,14 @@ public class EmailSender {
                                                String from, String to,
                                                String subject, String body,
                                                String[] attachmentPaths) throws MessagingException {
-        
+
         // Set mail server properties
         Properties properties = new Properties();
         properties.put("mail.smtp.host", host);
         properties.put("mail.smtp.port", port);
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.starttls.enable", "true");
-        
+
         // Create a mail session with authenticator
         Session session = Session.getInstance(properties, new Authenticator() {
             @Override
@@ -92,38 +97,38 @@ public class EmailSender {
                 return new PasswordAuthentication(username, password);
             }
         });
-        
+
         // Create a message
         Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(from));
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
         message.setSubject(subject);
         message.setSentDate(new Date());
-        
+
         // Create the message body part
         BodyPart messageBodyPart = new MimeBodyPart();
         messageBodyPart.setText(body);
-        
+
         // Create a multipart message
         Multipart multipart = new MimeMultipart();
         multipart.addBodyPart(messageBodyPart);
-        
+
         // Add attachments
         if (attachmentPaths != null && attachmentPaths.length > 0) {
             for (String filePath : attachmentPaths) {
                 addAttachment(multipart, filePath);
             }
         }
-        
+
         // Set the complete message parts
         message.setContent(multipart);
-        
+
         // Send the message
         Transport.send(message);
-        
+
         System.out.println("Email with attachments sent successfully!");
     }
-    
+
     /**
      * Adds an attachment to the email.
      *
@@ -138,16 +143,38 @@ public class EmailSender {
                 System.out.println("File not found: " + filePath);
                 return;
             }
-            
+
             MimeBodyPart attachmentPart = new MimeBodyPart();
             attachmentPart.attachFile(file);
             multipart.addBodyPart(attachmentPart);
-            
+
         } catch (Exception e) {
             throw new MessagingException("Error adding attachment: " + e.getMessage());
         }
     }
-    
+
+    /**
+     * Loads environment variables from a .env file.
+     *
+     * @return Properties object containing the environment variables
+     * @throws IOException if the .env file cannot be read
+     */
+    public static Properties loadEnvFile() throws IOException {
+        Properties properties = new Properties();
+
+        // Check if .env file exists
+        if (Files.exists(Paths.get(".env"))) {
+            try (InputStream input = new FileInputStream(".env")) {
+                // Load properties from the .env file
+                properties.load(input);
+            }
+        } else {
+            System.out.println("Warning: .env file not found. Using default values.");
+        }
+
+        return properties;
+    }
+
     /**
      * Example usage of the EmailSender class.
      */
@@ -156,23 +183,39 @@ public class EmailSender {
         String host = "smtp.gmail.com";
         String port = "587";
         String username = "quangbinh1001@gmail.com";
-        String password = "<APP_PWD>"; // Use app password for Gmail
-        
+        String password = "<APP_PWD>"; // Default value
+
+        try {
+            // Load environment variables from .env file
+            Properties envProperties = loadEnvFile();
+
+            // Get password from .env file, or use default if not found
+            if (envProperties.containsKey("APP_PWD")) {
+                password = envProperties.getProperty("APP_PWD");
+                System.out.println("Using password from .env file");
+            } else {
+                System.out.println("APP_PWD not found in .env file, using default value");
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading .env file: " + e.getMessage());
+            System.out.println("Using default password value");
+        }
+
         // Email details
         String from = "quangbinh1001@gmail.com";
         String to = "binh.le@trustifytechnology.com";
         String subject = "Test Email from Jakarta Mail";
         String body = "This is a test email sent using Jakarta Mail.";
-        
+
         try {
             // Send a simple email
             sendSimpleEmail(host, port, username, password, from, to, subject, body);
-            
+
             // Send an email with attachments
 //            String[] attachments = {"path/to/file1.pdf", "path/to/file2.jpg"};
 //            sendEmailWithAttachments(host, port, username, password, from, to,
 //                                    "Test Email with Attachments", body, attachments);
-            
+
         } catch (MessagingException e) {
             System.out.println("Failed to send email: " + e.getMessage());
             e.printStackTrace();

@@ -4,7 +4,11 @@ import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import java.util.Properties;
 import java.util.Date;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * A utility class for replying to emails using Jakarta Mail.
@@ -139,6 +143,28 @@ public class EmailReply {
     }
 
     /**
+     * Loads environment variables from a .env file.
+     *
+     * @return Properties object containing the environment variables
+     * @throws IOException if the .env file cannot be read
+     */
+    public static Properties loadEnvFile() throws IOException {
+        Properties properties = new Properties();
+
+        // Check if .env file exists
+        if (Files.exists(Paths.get(".env"))) {
+            try (InputStream input = new FileInputStream(".env")) {
+                // Load properties from the .env file
+                properties.load(input);
+            }
+        } else {
+            System.out.println("Warning: .env file not found. Using default values.");
+        }
+
+        return properties;
+    }
+
+    /**
      * Example usage of the EmailReply class.
      */
     public static void main(String[] args) {
@@ -148,9 +174,25 @@ public class EmailReply {
         String smtpHost = "smtp.gmail.com";
         String smtpPort = "587"; // TLS port
         String username = "quangbinh1001@gmail.com";
-        String password = "<APP_PWD>"; // Use app password for Gmail
+        String password = "<APP_PWD>"; // Default value
         String from = "quangbinh1001@gmail.com";
         String folderName = "INBOX";
+
+        try {
+            // Load environment variables from .env file
+            Properties envProperties = loadEnvFile();
+
+            // Get password from .env file, or use default if not found
+            if (envProperties.containsKey("APP_PWD")) {
+                password = envProperties.getProperty("APP_PWD");
+                System.out.println("Using password from .env file");
+            } else {
+                System.out.println("APP_PWD not found in .env file, using default value");
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading .env file: " + e.getMessage());
+            System.out.println("Using default password value");
+        }
 
         // Reply content
         String replyBody = "This is an automated reply to your email.\n\nThank you for your message.";
