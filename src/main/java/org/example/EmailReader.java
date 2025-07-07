@@ -246,7 +246,7 @@ public class EmailReader {
         String host = "imap.gmail.com";
         String port = "993"; // SSL port
         String username = "quangbinh1001@gmail.com";
-        String password = "ernw nngh xnbz pvmm"; // Use app password for Gmail
+        String password = "<APP_PWD>"; // Use app password for Gmail
         String folderName = "INBOX";
 
         try {

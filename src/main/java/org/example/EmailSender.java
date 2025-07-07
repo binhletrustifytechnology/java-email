@@ -156,7 +156,7 @@ public class EmailSender {
         String host = "smtp.gmail.com";
         String port = "587";
         String username = "quangbinh1001@gmail.com";
-        String password = "ernw nngh xnbz pvmm"; // Use app password for Gmail
+        String password = "<APP_PWD>"; // Use app password for Gmail
         
         // Email details
         String from = "quangbinh1001@gmail.com";

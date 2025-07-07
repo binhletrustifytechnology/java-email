@@ -148,7 +148,7 @@ public class EmailReply {
         String smtpHost = "smtp.gmail.com";
         String smtpPort = "587"; // TLS port
         String username = "quangbinh1001@gmail.com";
-        String password = "ernw nngh xnbz pvmm"; // Use app password for Gmail
+        String password = "<APP_PWD>"; // Use app password for Gmail
         String from = "quangbinh1001@gmail.com";
         String folderName = "INBOX";
 
