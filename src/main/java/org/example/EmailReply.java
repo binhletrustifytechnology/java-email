@@ -64,11 +64,14 @@ public class EmailReply {
         if (!subject.toLowerCase().startsWith("re:")) {
             subject = "Re: " + subject;
         }
+        System.out.println("Subject: " + subject);
         replyMessage.setSubject(subject);
+
 
         // Set In-Reply-To and References headers for proper threading
         String messageId = ((MimeMessage) originalMessage).getMessageID();
         if (messageId != null) {
+            System.out.println("Message ID: " + messageId);
             ((MimeMessage) replyMessage).setHeader("In-Reply-To", messageId);
 
             // Get existing References header and append the new Message-ID
@@ -78,6 +81,7 @@ public class EmailReply {
             } else {
                 references = references + " " + messageId;
             }
+            System.out.println("References: " + references);
             ((MimeMessage) replyMessage).setHeader("References", references);
         }
 
@@ -90,16 +94,16 @@ public class EmailReply {
         fullReplyBody.append("\n\n----- Original Message -----\n");
 
         // Add original message details
-        try {
+//        try {
             fullReplyBody.append("From: ").append(originalMessage.getFrom()[0]).append("\n");
             fullReplyBody.append("Date: ").append(originalMessage.getSentDate()).append("\n");
             fullReplyBody.append("Subject: ").append(originalMessage.getSubject()).append("\n\n");
 
             // Add original message content
-            fullReplyBody.append(EmailReader.getMessageContent(originalMessage));
-        } catch (IOException e) {
-            fullReplyBody.append("Error retrieving original message content: ").append(e.getMessage());
-        }
+//            fullReplyBody.append(EmailReader.getMessageContent(originalMessage));
+//        } catch (IOException e) {
+//            fullReplyBody.append("Error retrieving original message content: ").append(e.getMessage());
+//        }
 
         // Set the message content
         replyMessage.setText(fullReplyBody.toString());

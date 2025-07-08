@@ -153,6 +153,15 @@ public class EmailReader {
         System.out.println("Subject: " + message.getSubject());
         System.out.println("From: " + message.getFrom()[0]);
         System.out.println("Date: " + message.getSentDate());
+        String messageId = ((MimeMessage) message).getMessageID();
+        System.out.println("MessageID:  " + messageId);
+        String references = ((MimeMessage) message).getHeader("References", " ");
+        if (references == null) {
+            references = messageId;
+        } else {
+            references = references + " " + messageId;
+        }
+        System.out.println("References: " + references);
 //        System.out.println("Content: " + getMessageContent(message));
     }
 
