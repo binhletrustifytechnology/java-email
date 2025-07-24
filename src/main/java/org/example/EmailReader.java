@@ -127,8 +127,8 @@ public class EmailReader {
         StringBuilder result = new StringBuilder();
         int count = mimeMultipart.getCount();
 
-        for (int i = 0; i < count; i++) {
-            BodyPart bodyPart = mimeMultipart.getBodyPart(i);
+//        for (int i = 0; i < count; i++) {
+            BodyPart bodyPart = mimeMultipart.getBodyPart(count - 1);
             if (bodyPart.isMimeType("text/plain")) {
                 result.append(bodyPart.getContent());
             } else if (bodyPart.isMimeType("text/html")) {
@@ -137,7 +137,7 @@ public class EmailReader {
             } else if (bodyPart.getContent() instanceof MimeMultipart) {
                 result.append(getTextFromMimeMultipart((MimeMultipart) bodyPart.getContent()));
             }
-        }
+//        }
 
         return result.toString();
     }
@@ -162,7 +162,7 @@ public class EmailReader {
             references = references + " " + messageId;
         }
         System.out.println("References: " + references);
-//        System.out.println("Content: " + getMessageContent(message));
+        System.out.println("Content: " + getMessageContent(message));
     }
 
     /**
@@ -280,7 +280,7 @@ public class EmailReader {
         // Example IMAP server details for Gmail
         String host = "imap.gmail.com";
         String port = "993"; // SSL port
-        String username = "quangbinh1001@gmail.com";
+        String username = "quangbinh1100@gmail.com";
         String password = "<APP_PWD>"; // Default value
         String folderName = "INBOX";
 
