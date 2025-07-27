@@ -101,7 +101,20 @@ public class ExtractNormalEmailContentWithOpenAI {
                 if (choices != null && !choices.isEmpty()) {
                     Map<String, Object> choice = choices.get(0);
                     Map<String, String> messageResponse = (Map<String, String>) choice.get("message");
-                    return messageResponse.get("content");
+                    String extractedContent = messageResponse.get("content");
+                    
+                    // Remove Thai language prefix if present (e.g., "ข้อความจากคุณ Somruethai PA: ")
+                    if (extractedContent != null && extractedContent.contains(": ")) {
+                        // Check if the content starts with Thai characters
+                        if (extractedContent.matches("^[\\u0E00-\\u0E7F].*")) {
+                            int colonIndex = extractedContent.indexOf(": ");
+                            if (colonIndex > 0) {
+                                extractedContent = extractedContent.substring(colonIndex + 2);
+                            }
+                        }
+                    }
+                    
+                    return extractedContent;
                 }
             }
         } catch (Exception e) {
@@ -110,9 +123,22 @@ public class ExtractNormalEmailContentWithOpenAI {
         }
 
         // Fallback to simple JSON if OpenAI fails
+        String fallbackContent = content;
+        
+        // Apply the same Thai prefix removal logic to fallback content
+        if (fallbackContent != null && fallbackContent.contains(": ")) {
+            // Check if the content starts with Thai characters
+            if (fallbackContent.matches("^[\\u0E00-\\u0E7F].*")) {
+                int colonIndex = fallbackContent.indexOf(": ");
+                if (colonIndex > 0) {
+                    fallbackContent = fallbackContent.substring(colonIndex + 2);
+                }
+            }
+        }
+        
         return String.format(
                 "{\"content\":\"%s\"}",
-                content.replaceAll("\"", "\\\\\"").replaceAll("\n", "\\\\n")
+                fallbackContent.replaceAll("\"", "\\\\\"").replaceAll("\n", "\\\\n")
         );
     }
 
