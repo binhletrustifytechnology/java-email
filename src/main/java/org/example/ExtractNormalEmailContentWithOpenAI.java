@@ -102,6 +102,8 @@ public class ExtractNormalEmailContentWithOpenAI {
                     Map<String, Object> choice = choices.get(0);
                     Map<String, String> messageResponse = (Map<String, String>) choice.get("message");
                     String extractedContent = messageResponse.get("content");
+
+                    System.out.println("Content in JSON: <" + extractedContent + ">");
                     
                     // Remove Thai language prefix if present (e.g., "ข้อความจากคุณ Somruethai PA: ")
                     if (extractedContent != null && extractedContent.contains(": ")) {
@@ -263,7 +265,7 @@ public class ExtractNormalEmailContentWithOpenAI {
             String extractedJson = extractor.extractContentWithOpenAI(content);
 
             // Display the extracted JSON
-            System.out.println("\nExtracted JSON:\n");
+            System.out.println("\nExtracted JSON:");
             System.out.println(extractedJson);
 
         } catch (Exception e) {
